@@ -15,12 +15,12 @@ in addition, a table called `__tas_settings` may be defined, which may contain t
 # Keybinds
 * __F__ - go to next level
 * __S__ - go to previous level
-* __Shift + D__ - rewind/fast forward to the first frame of control
-* __Shift + G__ - record gif of entire level
+* __D__ - rewind/fast forward to the first frame of control
+* __G__ - record gif of entire level
 * __U__ - save cleaned up version of the file - not containing frames after the end of the level (this requires the TAS to playback until the end of the level). can be interrupted by pressing any input
 cctas files will be saved and loaded from the path `<love data folder>/Celia/<cartname>/TAS<level_index>.tas`
-* __Shift + N__ - begin full game playback. the game will play from the start, and load the input file for every level it reaches. this can be interrupted by pressing any key.
-* __Shift + = (+)__ - increase max\_djump by 1. by default, in vanilla based carts, max\_djump will be 1 before 2200, and 2 afterwards
+* __N__ - begin full game playback. the game will play from the start, and load the input file for every level it reaches. this can be interrupted by pressing any key.
+* __+__ - increase max\_djump by 1. by default, in vanilla based carts, max\_djump will be 1 before 2200, and 2 afterwards
 * __-__ - decrease max\_djump by 1
 * __=__ - restore max\_djump to default behaviour
 * __A__ - enable loading jank offset mode

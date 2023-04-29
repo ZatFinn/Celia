@@ -142,29 +142,26 @@ function cctas:keypressed(key, isrepeat)
 	elseif key=='s' then
 		self:push_undo_state()
 		self:prev_level()
-	elseif key=='d' and love.keyboard.isDown('lshift', 'rshift') then
+	elseif key=='d' then
 		self:player_rewind()
-	elseif key=='g' and love.keyboard.isDown('lshift', 'rshift') then
+	elseif key=='g' then
 		self:start_gif_recording()
-	elseif key == 'n' and love.keyboard.isDown('lshift', 'rshift') then
+	elseif key == 'n' then
 		self:push_undo_state()
 		self:begin_full_game_playback()
 	elseif key == 'u' then
 		self:push_undo_state()
 		self:begin_cleanup_save()
-	elseif key == '=' then
-		if love.keyboard.isDown('lshift', 'rshift') then
-		-- +
-			if self.max_djump_overload ==-1 then
-				self.max_djump_overload = pico8.cart.max_djump + 1
-			else
-				self.max_djump_overload = self.max_djump_overload + 1
-			end
-			self:load_level(self:level_index(), false)
+	elseif key == '+' then
+		if self.max_djump_overload ==-1 then
+			self.max_djump_overload = pico8.cart.max_djump + 1
 		else
-			self.max_djump_overload = -1
-			self:load_level(self:level_index(), false)
+			self.max_djump_overload = self.max_djump_overload + 1
 		end
+		self:load_level(self:level_index(), false)
+	elseif key == '=' then
+		self.max_djump_overload = -1
+		self:load_level(self:level_index(), false)
 	elseif key == '-' then
 		if self.max_djump_overload ==-1 then
 			self.max_djump_overload = pico8.cart.max_djump - 1

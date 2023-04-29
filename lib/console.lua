@@ -142,7 +142,10 @@ end
 
 -- Store global state for whether or not the console is enabled / disabled.
 local enabled = false
-function console.isEnabled() return enabled end
+local going_to_enable = false
+function console.isEnabled()
+  return enabled or going_to_enable
+end
 
 -- Store the printed lines in a buffer.
 local lines = {}
@@ -363,6 +366,10 @@ function console.textinput(input)
   -- If disabled, ignore the input, otherwise insert at the cursor.
   local ctrl=love.keyboard.isDown("lctrl","lgui","rctrl","rgui")
   if not enabled then
+    if going_to_enable then
+      enabled = true
+      going_to_enable = false
+    end
     return
   elseif (input == "=" or input=="+") and ctrl then
       console.FONT_SIZE = console.FONT_SIZE + 1
@@ -414,8 +421,11 @@ function console.keypressed(key, scancode, isrepeat)
   local shift = love.keyboard.isDown("lshift")
   local alt = love.keyboard.isDown("lalt")
 
-  if ctrl and key == "t" then
-    enabled = not enabled
+  if key == '`' then
+    going_to_enable = true
+  end
+  if key == 'escape' then
+    enabled = false
   end
   -- Ignore if the console isn't enabled.
   if not enabled then return end

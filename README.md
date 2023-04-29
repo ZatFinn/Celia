@@ -75,21 +75,21 @@ have to do the copying and zipping manually.
 * __Shift__ + __controller button__ - toggle hold of the respective button. held buttons will be pressed when advancing/rewinding to a frame
 * __D__ - preform a full-rewind, return to frame 0
 * __P__ - start realtime playback. The TAS will play back in real time, and inputs can't be modified. any keypress during realtime playback will stop it.
-* __Shift + R__ - reset, clear the inputs, and rewind to frame 0
+* __R__ - reset, clear the inputs, and rewind to frame 0
 * __M__ - save the current inputs to a file <cartname>.lua, in the games data folder (By default, on windows this is %appdata%/love/Celia, and on linux ~/.local/share/love/Celia). The filepath will be outputted to the terminal.
-* __Shift + W__ - Load the input file from the data folder
+* __W__ - Load the input file from the data folder
 * __Insert__ - Insert a blank input frame before the current frame (This respects held keys)
-* __Ctrl + Insert__ - Duplicate the current input frame
+* __2__ - Duplicate the current input frame
 * __Delete__ - Delete the current input frame
 * __Ctrl + V__ - paste inputs from the clipboard before the current frame
-* __Ctrl + Z__ - perform undo. pretty much any operation that changes the inputs can be undone. max undo depth is 30
-* __Ctrl + Shift + Z__ perform redo.
-* __Shift__ + __L__ - enable visual selection mode
-* __Ctrl + T__ - toggle console
+* __[__ - perform undo. pretty much any operation that changes the inputs can be undone. max undo depth is 30
+* __]__ perform redo.
+* __O__ - enable visual selection mode
+* __`__ - enable console (__ESC__ to exit)
 * __F3__ - begin gif recording
 * __F4__ - stop gif recording
 * __F6__ - take screenshot
-* __Ctrl + R__ - reload cart and tas tool (Warning: this cannot be undone!)
+* __Drag and dropping the cart again, or refreshing the page if you're tasing vanilla__ - reload cart and tas tool (Warning: this cannot be undone!)
 
 ### Visual selection mode
 Visual selection mode allows you to perform operations on a contiguous range of inputs. The selected range will always start with the current frame (highlighted blue on the piano roll), and contain all subsequent frames (highlighted gray). You can always exit visual selection mode, by making the selection empty, or pressing __ESC__.

@@ -488,44 +488,39 @@ function tas:keypressed(key, isrepeat)
 	elseif self.last_selected_frame ~= -1 then
 		self:selection_keypress(key, isrepeat)
 	elseif key=='l' then
-		if love.keyboard.isDown('lshift', 'rshift') then
-			if self:frame_count() + 1 < #self.keystates then
-				self.last_selected_frame = self:frame_count() + 2
-			end
-		else
-			self:step()
+		self:step()
+	elseif key=='o' then
+		if self:frame_count() + 1 < #self.keystates then
+			self.last_selected_frame = self:frame_count() + 2
 		end
 	elseif key=='k' then
 		self:rewind()
 	elseif key=='d' then
 		self:full_rewind()
-	elseif key=='r' and love.keyboard.isDown('lshift','rshift') then
+	elseif key=='r' then
 		self:push_undo_state()
 		self:full_reset()
 	elseif key=='m' then
 		self:save_input_file()
-	elseif key=='w' and love.keyboard.isDown('lshift', 'rshift') then
+	elseif key=='w' then
 		self:push_undo_state()
 		self:load_input_file()
 	elseif key=='insert' then
 		self:push_undo_state()
-		if ctrl then
-			self:duplicate_keystate()
-		else
-			self:insert_keystate()
-		end
+		self:insert_keystate()
+	elseif key=='2' then
+		self:push_undo_state()
+		self:duplicate_keystate()
 	elseif key=='delete' then
 		self:push_undo_state()
 		self:delete_keystate()
 	elseif key == 'v' and ctrl then
 		self:push_undo_state()
 		self:paste_inputs()
-	elseif key == 'z' and ctrl then
-		if love.keyboard.isDown('lshift', 'rshift') then
-			self:perform_redo()
-		else
-			self:preform_undo()
-		end
+	elseif key == ']' then
+		self:perform_redo()
+	elseif key == '[' then
+		self:preform_undo()
 	else
 		for i = 0, #pico8.keymap[0] do
 			for _, testkey in pairs(pico8.keymap[0][i]) do
