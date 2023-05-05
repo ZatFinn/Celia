@@ -286,26 +286,26 @@ function love.load(argv)
 	if not love.filesystem.getInfo("tmp/","directory") then
 		love.filesystem.createDirectory("tmp/")
 	end
-	if not love.filesystem.getInfo("config","directory") then
-		love.filesystem.createDirectory("config")
-	end
-	if not love.filesystem.getInfo("config/keys.conf","file") then
-		-- copy default config file to the user's configuration
-		local source_fh, source_e = love.filesystem.newFile((is_web and "web-" or "").."default.keys.conf","r")
-		local target_fh, target_e = love.filesystem.newFile("config/keys.conf","w")
-		if source_e or target_e then
-			if source_e then
-				log(source_e)
-			else
-				log(target_e)
-			end
-		else
-			target_fh:write(source_fh:read())
-			source_fh:close()
-			target_fh:close()
-		end
-	end
-	keybinds2.init()
+	-- if not love.filesystem.getInfo("config","directory") then
+	-- 	love.filesystem.createDirectory("config")
+	-- end
+	-- if not love.filesystem.getInfo("config/keys.conf","file") then
+	-- 	-- copy default config file to the user's configuration
+	-- 	local source_fh, source_e = love.filesystem.newFile((is_web and "web-" or "").."default.keys.conf","r")
+	-- 	local target_fh, target_e = love.filesystem.newFile("config/keys.conf","w")
+	-- 	if source_e or target_e then
+	-- 		if source_e then
+	-- 			log(source_e)
+	-- 		else
+	-- 			log(target_e)
+	-- 		end
+	-- 	else
+	-- 		target_fh:write(source_fh:read())
+	-- 		source_fh:close()
+	-- 		target_fh:close()
+	-- 	end
+	-- end
+	keybinds2.load_global_config()
 
 
 	osc = {}
