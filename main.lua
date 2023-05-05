@@ -12,7 +12,7 @@ local bit = require("numberlua").bit
 local api = require("api")
 local cart = require("cart")
 
-local keybinds2 = require("keybindings2")
+keybinds2 = require("keybindings2")
 
 local tas = require("tas")
 local cctas = require("cctas")

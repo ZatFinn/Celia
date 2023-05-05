@@ -96,9 +96,9 @@ function tas:advance_keystate(curr_keystate)
 	curr_keystate= bit.bor(curr_keystate, self.hold)
 	if not self.realtime_playback then
 		for i=0, #pico8.keymap[0] do
-			-- if ke["k_"..pico8.keymap[0][i]] then
-			-- 	curr_keystate = bit.bor(curr_keystate, 2^i)
-			-- end
+			if keybinds2.is_action_down("k_"..pico8.keymap[0][i]) then
+				curr_keystate = bit.bor(curr_keystate, 2^i)
+			end
 		end
 	end
 	return curr_keystate
@@ -577,7 +577,7 @@ function tas:selection_actionpress(action, isrepeat)
 							self:toggle_key(i, frame)
 						end
 					end
-			elseif action == "all_"..pico8.keymap[0][i] then -- TODO: when is_action_down is implemented, mix that with the previous case
+			elseif action == "all_"..pico8.keymap[0][i] then -- toggle each frame whatsoever
 					self:push_undo_state()
 					self:toggle_key(i)
 					for frame = self:frame_count() + 2, self.last_selected_frame do
