@@ -9,7 +9,6 @@ tas.hud_w = 48
 tas.hud_h = 0
 tas.scale = 6
 tas.pianoroll_w=65
-tas.just_advanced = false
 
 
 --wrapper functions
@@ -91,7 +90,6 @@ end
 --
 -- i.e, if the input is currently right, and up is held, up+right will be returned
 function tas:advance_keystate(curr_keystate)
-	self.just_advanced = true
 	curr_keystate = curr_keystate or 0
 	curr_keystate= bit.bor(curr_keystate, self.hold)
 	if not self.realtime_playback then
