@@ -409,37 +409,37 @@ function console.execute(command)
   end
 end
 
-function console.keypressed(key, scancode, isrepeat)
+function console.actionpressed(action, isrepeat)
 
-  if ke.console then
+  if action == "console" then
     enabled = not enabled
   end
   -- Ignore if the console isn't enabled.
   if not enabled then return end
 
 
-  if ke.del_backward then command:delete_backward()
+  if action == "del_backward" then command:delete_backward()
 
-  elseif ke.prev_command then command:previous()
-  elseif ke.next_command then command:next()
+  elseif action == "prev_command" then command:previous()
+  elseif action == "next_command" then command:next()
 
-  elseif ke.prev_word then command:backward_word()
-  elseif ke.next_word then command:forward_word()
+  elseif action == "prev_word" then command:backward_word()
+  elseif action == "next_word" then command:forward_word()
 
-  elseif ke.cmd_go_to_start then command:beginning_of_line()
-  elseif ke.cmd_go_to_end then command:end_of_line()
+  elseif action == "cmd_go_to_start" then command:beginning_of_line()
+  elseif action == "cmd_go_to_end" then command:end_of_line()
 
-  elseif ke.prev_char then command:backward_character()
-  elseif ke.next_char then command:forward_character()
+  elseif action == "prev_char" then command:backward_character()
+  elseif action == "next_char" then command:forward_character()
 
-  elseif ke.clear_line then command:clear()
+  elseif action == "clear_line" then command:clear()
 
-  elseif ke.send_line then
+  elseif action == "send_line" then
     console.addHistory(command.text)
     console.execute(command.text)
     command:clear()
 
-  elseif ke.complete_command then
+  elseif action == "complete_command" then
     command:complete()
   end
 end

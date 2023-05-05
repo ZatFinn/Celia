@@ -107,25 +107,25 @@ function cctas:toggle_hold(i)
 	self.super.toggle_hold(self, i)
 end
 
-function cctas:keypressed(key, isrepeat)
+function cctas:actionpressed(action, isrepeat)
 	if self.full_game_playback then
 		self.full_game_playback = false
 		self.realtime_playback = false
 	--TODO: abstract this
 	elseif self.realtime_playback or self.seek or self.last_selected_frame ~= -1 then
-		self.super.keypressed(self,key,isrepeat)
+		self.super.actionpressed(self,action,isrepeat)
 	elseif self.modify_loading_jank then
-		self:loading_jank_keypress(key,isrepeat)
+		self:loading_jank_actionpress(action,isrepeat)
 	elseif self.modify_rng_seeds then
-		self:rng_seed_keypress(key,isrepeat)
-	elseif ke.jank_offset and not isrepeat then
+		self:rng_seed_actionpress(action,isrepeat)
+	elseif action == "jank_offset" and not isrepeat then
 		-- TODO: telegraph this better?
 		if not self.cart_settings.disable_loading_jank then
 			self:full_rewind()
 			self:push_undo_state()
 			self.modify_loading_jank = true
 		end
-	elseif ke.rng_seeding and not isrepeat then
+	elseif action == "rng_seeding" and not isrepeat then
 		self.rng_seed_idx = -1
 		-- don't enable rng mode if no seedable objects exist
 		if self:advance_seeded_obj(1) then
@@ -134,33 +134,33 @@ function cctas:keypressed(key, isrepeat)
 			self:push_undo_state()
 			self.modify_rng_seeds = true
 		end
-	elseif ke.next_level then
+	elseif action == "next_level" then
 		self:push_undo_state()
 		self:next_level()
-	elseif ke.prev_level then
+	elseif action == "prev_level" then
 		self:push_undo_state()
 		self:prev_level()
-	elseif ke.rewind then
+	elseif action == "rewind" then
 		self:player_rewind()
-	elseif ke.level_gif then
+	elseif action == "level_gif" then
 		self:start_gif_recording()
-	elseif ke.full_playback then
+	elseif action == "full_playback" then
 		self:push_undo_state()
 		self:begin_full_game_playback()
-	elseif ke.clean_save then
+	elseif action == "clean_save" then
 		self:push_undo_state()
 		self:begin_cleanup_save()
-	elseif ke.inc_djump then
+	elseif action == "inc_djump" then
 		if self.max_djump_overload ==-1 then
 			self.max_djump_overload = pico8.cart.max_djump + 1
 		else
 			self.max_djump_overload = self.max_djump_overload + 1
 		end
 		self:load_level(self:level_index(), false)
-	elseif ke.reset_djump then
+	elseif action == "reset_djump" then
 		self.max_djump_overload = -1
 		self:load_level(self:level_index(), false)
-	elseif ke.dec_djump then
+	elseif action == "dec_djump" then
 		if self.max_djump_overload ==-1 then
 			self.max_djump_overload = pico8.cart.max_djump - 1
 		else
@@ -168,41 +168,41 @@ function cctas:keypressed(key, isrepeat)
 		end
 		self.max_djump_overload = math.max(self.max_djump_overload, 0)
 		self:load_level(self:level_index(), false)
-	elseif ke.print_pos then
+	elseif action == "print_pos" then
 		local p = self:find_player()
 		if p then
 			print(p)
 		end
-	elseif ke.copy then
+	elseif action == "copy" then
 		--copy player position to clipboard
 		local p = self:find_player()
 		if p then
 			love.system.setClipboardText(tostring(p))
 		end
 	else
-		self.super.keypressed(self,key,isrepeat)
+		self.super.actionpressed(self,action,isrepeat)
 	end
 end
 
-function cctas:loading_jank_keypress(key,isrepeat)
-	if ke.inc_jank then
+function cctas:loading_jank_actionpress(action,isrepeat)
+	if action == "inc_jank" then
 		self.loading_jank_offset = math.min(self.loading_jank_offset +1, math.max(#pico8.cart.objects-self.prev_obj_count + 1,0))
-	elseif ke.dec_jank then
+	elseif action == "dec_jank" then
 		self.loading_jank_offset = math.max(self.loading_jank_offset - 1, math.min(-self.prev_obj_count+1,0))
-	elseif ke.quit_jank and not isrepeat then
+	elseif action == "quit_jank" and not isrepeat then
 		self.modify_loading_jank = false
 		self:load_level(self:level_index(),false)
 	end
 
 end
 
-function cctas:rng_seed_keypress(key,isrepeat)
+function cctas:rng_seed_actionpress(action,isrepeat)
 	-- TODO: make seed visually update in the current frame, and make rewinding not visually broken
-	if ke.inc_rng or ke.dec_rng then
+	if action == "inc_rng" or action == "dec_rng" then
 		local obj = pico8.cart.objects[self.rng_seed_idx]
 		local seed = self:get_seed_handler(obj)
 		if seed ~= nil then
-			if ke.inc_rng then
+			if action == "inc_rng" then
 				seed.increase_seed(obj)
 			else
 				seed.decrease_seed(obj)
@@ -217,11 +217,11 @@ function cctas:rng_seed_keypress(key,isrepeat)
 			-- self:rewind()
 			-- self:step()
 		end
-	elseif ke.next_object then
+	elseif action == "next_object" then
 		self:advance_seeded_obj(1)
-	elseif ke.prev_object then
+	elseif action == "prev_object" then
 		self:advance_seeded_obj(-1)
-	elseif ke.quit_rng and not isrepeat then
+	elseif action == "quit_rng" and not isrepeat then
 		self.modify_rng_seeds = false
 	end
 end

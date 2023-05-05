@@ -9,7 +9,6 @@ tas.hud_w = 48
 tas.hud_h = 0
 tas.scale = 6
 tas.pianoroll_w=65
-tas.dontrepeat = {}
 tas.just_advanced = false
 
 
@@ -97,9 +96,9 @@ function tas:advance_keystate(curr_keystate)
 	curr_keystate= bit.bor(curr_keystate, self.hold)
 	if not self.realtime_playback then
 		for i=0, #pico8.keymap[0] do
-			if ke["k_"..pico8.keymap[0][i]] then
-				curr_keystate = bit.bor(curr_keystate, 2^i)
-			end
+			-- if ke["k_"..pico8.keymap[0][i]] then
+			-- 	curr_keystate = bit.bor(curr_keystate, 2^i)
+			-- end
 		end
 	end
 	return curr_keystate
@@ -472,8 +471,8 @@ function tas:draw_gif_overlay()
 	self:draw_input_display(1+frame_count_width+1,1)
 end
 
-function tas:keypressed(key, isrepeat)
-	if ke.playback then
+function tas:actionpressed(action, isrepeat)
+	if action == "playback" then
 		self.realtime_playback = not self.realtime_playback
 	elseif self.realtime_playback then
 		-- pressing any key during realtime playback stops it
@@ -485,104 +484,105 @@ function tas:keypressed(key, isrepeat)
 		self.seek=nil
 	--TODO: block keypresses even when overloading this func
 	elseif self.last_selected_frame ~= -1 then
-		self:selection_keypress(key, isrepeat)
-	elseif ke.visual then
+		self:selection_actionpress(action)
+	elseif action == "visual" then
 		if self:frame_count() + 1 < #self.keystates then
 			self.last_selected_frame = self:frame_count() + 2
 		end
-	elseif ke.next_frame then
+	elseif action == "next_frame" then
 		self:step()
-	elseif ke.prev_frame then
+	elseif action == "prev_frame" then
 		self:rewind()
-	elseif ke.full_rewind then
+	elseif action == "full_rewind" then
 		self:full_rewind()
-	elseif ke.reset_tas then
+	elseif action == "reset_tas" then
 		self:push_undo_state()
 		self:full_reset()
-	elseif ke.save_tas then
+	elseif action == "save_tas" then
 		self:save_input_file()
-	elseif ke.open_tas then
+	elseif action == "open_tas" then
 		self:push_undo_state()
 		self:load_input_file()
-	elseif ke.insert_blank then
+	elseif action == "insert_blank" then
 		self:push_undo_state()
 		self:insert_keystate()
-	elseif ke.duplicate then
+	elseif action == "duplicate" then
 		self:duplicate_keystate()
-	elseif ke.delete then
+	elseif action == "delete" then
 		self:push_undo_state()
 		self:delete_keystate()
-	elseif ke.copy then
+	elseif action == "copy" then
 		self:push_undo_state()
 		self:paste_inputs()
-	elseif ke.redo then
+	elseif action == "redo" then
 		self:perform_redo()
-	elseif ke.undo then
+	elseif action == "undo" then
 		self:preform_undo()
 	elseif not isrepeat then
 		for i = 0, #pico8.keymap[0] do
-			if not self.dontrepeat[i] then
-				if ke["hold_"..pico8.keymap[0][i]] then
-					self:push_undo_state()
-					self:toggle_hold(i)
-					self.dontrepeat[i]=true
-				elseif ke["k_"..pico8.keymap[0][i]] then
-					self:push_undo_state()
-					self:toggle_key(i)
-					self.dontrepeat[i]=true
-				end
+			if action == "hold_"..pico8.keymap[0][i] then
+				self:push_undo_state()
+				self:toggle_hold(i)
+			elseif action == "k_"..pico8.keymap[0][i] then
+				self:push_undo_state()
+				self:toggle_key(i)
 			end
 		end
 	end
 end
 
-function tas:selection_keypress(key, isrepeat)
+function tas:selection_actionpress(action, isrepeat)
 	local ctrl = love.keyboard.isDown("lctrl", "rctrl", "lgui", "rgui")
-	if ke.next_frame then
+	if action == "next_frame" or action == "visual" then
 		self.last_selected_frame = math.min(self.last_selected_frame + 1, #self.keystates)
-	elseif ke.prev_frame then
+	elseif action == "prev_frame" then
 		self.last_selected_frame = self.last_selected_frame - 1
 		if self.last_selected_frame <= self:frame_count() + 1 then
 			self.last_selected_frame = -1
 		end
-	elseif ke.exit_visual then
+	elseif action == "exit_visual" then
 		self.last_selected_frame = -1
 
-	elseif ke.delete then
+	elseif action == "delete" then
 		self:push_undo_state()
 		self:delete_selection()
-	elseif ke.copy then
+	elseif action == "copy" then
 		love.system.setClipboardText(self:get_input_str(self:frame_count() + 1, self.last_selected_frame))
-	elseif ke.cut then
+	elseif action == "cut" then
 		love.system.setClipboardText(self:get_input_str(self:frame_count() + 1, self.last_selected_frame))
 		self:push_undo_state()
 		self:delete_selection()
-	elseif ke.paste then
+	elseif action == "paste" then
 		self:push_undo_state()
 		self:delete_selection()
 		self:paste_inputs()
-	elseif ke.redo then
+	elseif action == "redo" then
 		self:perform_redo()
-	elseif ke.undo then
+	elseif action == "undo" then
 		self:preform_undo()
-	elseif ke.go_to_start then
+	elseif action == "go_to_start" then
 		self.last_selected_frame = self:frame_count() + 2
-	elseif ke.go_to_end then
+	elseif action == "go_to_end" then
 		self.last_selected_frame = #self.keystates
 	elseif not isrepeat then
 		-- change the state of the key in all selected frames
 		-- if alt is held, toggle the state in all the frames
 		-- otherwise, toggle it in the first frame, and set all other selected frames to match it
 		for i = 0, #pico8.keymap[0] do
-			if ke["k_"..pico8.keymap[0][i]] and not self.dontrepeat[i] then
+			if action == "k_"..pico8.keymap[0][i] then
 					self:push_undo_state()
 					self:toggle_key(i)
 					for frame = self:frame_count() + 2, self.last_selected_frame do
-						if ke["all_"..pico8.keymap[0][i]] or self:key_down(i,frame) ~= self:key_down(i) then
+						if self:key_down(i,frame) ~= self:key_down(i) then
 							self:toggle_key(i, frame)
 						end
 					end
-					self.dontrepeat[i] = true
+			elseif action == "all_"..pico8.keymap[0][i] then -- TODO: when is_action_down is implemented, mix that with the previous case
+					self:push_undo_state()
+					self:toggle_key(i)
+					for frame = self:frame_count() + 2, self.last_selected_frame do
+						self:toggle_key(i, frame)
+					end
 			end
 		end
 	end

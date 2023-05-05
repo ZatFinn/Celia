@@ -12,8 +12,7 @@ local bit = require("numberlua").bit
 local api = require("api")
 local cart = require("cart")
 
-local keybinds = require("keybindings")
-ke = keybinds.k
+local keybinds2 = require("keybindings2")
 
 local tas = require("tas")
 local cctas = require("cctas")
@@ -306,7 +305,8 @@ function love.load(argv)
 			target_fh:close()
 		end
 	end
-	keybinds.init{ file = "config/keys.conf" }
+	keybinds2.init()
+
 
 	osc = {}
 	-- tri
@@ -972,13 +972,12 @@ function stop_gif_recording()
 	end
 end
 
-function love.keypressed(key, scancode, isrepeat)
-	console.keypressed(key, scancode, isrepeat)
+local function actionpressed(action, isrepeat)
+	console.actionpressed(action, isrepeat)
 	if console.isEnabled() then
 		return
 	end
-
-	if ke.full_reload and not ke.alt then
+	if action == "full_reload" then
 		api.reload_cart()
 		api.run()
 		tastool = tastool.class()
@@ -992,22 +991,22 @@ function love.keypressed(key, scancode, isrepeat)
 	-- 	api.load(initialcartname)
 	-- 	api.run()
 	-- 	return
-	elseif ke.full_quit then
+	elseif action == "full_quit" then
 		love.event.quit()
 	-- elseif key == "v" and isCtrlOrGuiDown() and not isAltDown() then
 	--	pico8.clipboard = love.system.getClipboardText()
 	-- elseif pico8.can_pause and (key == "pause" or key == "p") then
 	-- 	paused = not paused
-	elseif ke.screenshot then
+	elseif action == "screenshot" then
 		-- screenshot
 		local filename = cartname .. "-" .. os.time() .. ".png"
 		local screenshot = love.graphics.captureScreenshot(filename)
 		log("saved screenshot to", filename)
-	elseif ke.gif_rec_start then
+	elseif action == "gif_rec_start" then
 		start_gif_recording()
-	elseif ke.gif_rec_stop then
+	elseif action == "gif_rec_stop" then
 		stop_gif_recording()
-	elseif ke.fullscreen then
+	elseif action == "fullscreen" then
 		local canvas=love.graphics.getCanvas()
 		love.graphics.setCanvas()
 		love.window.setFullscreen(not love.window.getFullscreen(), "desktop")
@@ -1016,28 +1015,18 @@ function love.keypressed(key, scancode, isrepeat)
 		love.graphics.setCanvas(canvas)
 		return
 	else
-		tastool:keypressed(key, isrepeat)
+		tastool:actionpressed(action, isrepeat)
 	end
+end
+
+
+function love.keypressed(key, scancode, isrepeat)
+	keybinds2.dispatch_actions(key, scancode, isrepeat, actionpressed)
 	if pico8.cart and pico8.cart._keydown then
 		return pico8.cart._keydown(key)
 	end
 end
 
--- the existence of this function is itself a sign that keybindings.lua still sucks
-function love.keyreleased(key)
-	if tastool.just_advanced then
-		local mem = keybinds.get_ongoing()
-		local active_chord = table.remove(mem)
-		local prev_chord = table.remove(mem)
-		for k in pairs(prev_chord) do
-			if type(k)=="string" and k~=key and k~="prev_frame" and k~="next_frame" then
-				active_chord[k] = true
-			end
-		end
-		tastool.just_advanced = false
-	end
-	tastool.dontrepeat = {}
-end
 -- function love.keyreleased(key)
 --	for p = 0, 1 do
 --		for i = 0, #pico8.keymap[p] do
